@@ -21,7 +21,9 @@ class _HomeState extends State<Home> {
   int age = 0;
   int weight = 2;
   double BMI = 0.0;
-  bool genderSelected = false;
+  bool _malegenderSelected = false;
+  bool _femalegenderSelected = false;
+  bool _AgenderSelected = false;
 //Functions
 //Age Widget Functions
   void agePlus() {
@@ -56,14 +58,48 @@ class _HomeState extends State<Home> {
     });
   }
 
-//GenderCheck
-  void _genderSelect() {
-    genderSelected = true;
+//Gender Manipulation
+//colorchange
+  Color? _maleColorController() {
+    if (_malegenderSelected == false) {
+      return Colors.indigo[700];
+    } else {
+      return Theme.of(context).accentColor;
+    }
   }
 
+  Color? _femaleColorController() {
+    if (_femalegenderSelected == false) {
+      return Colors.indigo[700];
+    } else {
+      return Theme.of(context).accentColor;
+    }
+  }
+
+//gender related bool vaiables manipulation functions
+  void _maleButton() {
+    if (_malegenderSelected == false && _AgenderSelected == false) {
+      setState(() {
+        _AgenderSelected = true;
+
+        _malegenderSelected = true;
+      });
+    }
+  }
+
+  void _femaleButton() {
+    if (_femalegenderSelected == false && _AgenderSelected == false) {
+      setState(() {
+        _AgenderSelected = true;
+        _femalegenderSelected = true;
+      });
+    }
+  }
+
+  ///
 //Calculate Final BMi
   void calCulateBmi() {
-    if (weight >= 2 && age > 0 && height >= 30 && genderSelected) {
+    if (weight >= 2 && age > 0 && height >= 30 && _AgenderSelected) {
       String Quote;
       setState(() {
         BMI =
@@ -87,7 +123,9 @@ class _HomeState extends State<Home> {
 
   //Reset Function
   void resetData() {
-    //genderSelected = false;
+    _AgenderSelected = false;
+    _malegenderSelected = false;
+    _femalegenderSelected = false;
     setState(() {
       height = 30.0;
       age = 0;
@@ -98,7 +136,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    //print('height:+$height');
     final Appbar = AppBar(
       leading: IconButton(
         onPressed: () => resetData(),
@@ -119,66 +156,74 @@ class _HomeState extends State<Home> {
       centerTitle: true,
     );
     return Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
-        appBar: Appbar,
-        body: Column(
-          //mainAxisAlignment: MainAxisAlignment.,
-          children: <Widget>[
-            Container(
-              color: Colors.transparent,
-              height: (MediaQuery.of(context).size.height -
-                      Appbar.preferredSize.height -
-                      MediaQuery.of(context).padding.top) *
-                  0.30,
-              child: Gender(
-                genderSelected: _genderSelect,
-                //notSelected: notSelected,
+      backgroundColor: Theme.of(context).primaryColor,
+      appBar: Appbar,
+      body: Column(
+        //mainAxisAlignment: MainAxisAlignment.,
+        children: <Widget>[
+          //GENDER SELECTION SECTOR
+          Container(
+            color: Colors.transparent,
+            height: (MediaQuery.of(context).size.height -
+                    Appbar.preferredSize.height -
+                    MediaQuery.of(context).padding.top) *
+                0.30,
+            child: Gender(
+                maleButton: _maleButton,
+                femaleButton: _femaleButton,
+                maleColorController: _maleColorController,
+                femaleColorController: _femaleColorController),
+          ),
+          //HEIGHT SELECTION SLIDER
+          Container(
+            margin: EdgeInsets.fromLTRB(20.0, 3.0, 20.0, 20.0),
+            color: Colors.indigo[800],
+            height: (MediaQuery.of(context).size.height -
+                    Appbar.preferredSize.height -
+                    MediaQuery.of(context).padding.top) *
+                0.25,
+            child: Height(
+              slidervalue: height,
+              heightSet: setHeight,
+            ),
+          ),
+          //AGE AND WEIGHT SELECTION PART
+          Container(
+            color: Colors.transparent,
+            height: (MediaQuery.of(context).size.height -
+                    Appbar.preferredSize.height -
+                    MediaQuery.of(context).padding.top) *
+                0.3118,
+            child: LayoutBuilder(
+              builder: (builder, constraints) => Row(
+                children: <Widget>[
+                  //Weight Widget
+                  Weight(
+                    weight: weight,
+                    weightAdd: plusWeight,
+                    weightSub: subWeight,
+                  ),
+                  //Age Widget
+                  Age(
+                    age: age,
+                    plusAge: agePlus,
+                    subAge: ageSub,
+                  ),
+                ],
               ),
             ),
-            Container(
-              margin: EdgeInsets.fromLTRB(20.0, 3.0, 20.0, 20.0),
-              color: Colors.indigo[800],
-              height: (MediaQuery.of(context).size.height -
-                      Appbar.preferredSize.height -
-                      MediaQuery.of(context).padding.top) *
-                  0.25,
-              child: Height(
-                slidervalue: height,
-                heightSet: setHeight,
-              ),
-            ),
-            Container(
-              color: Colors.transparent,
-              height: (MediaQuery.of(context).size.height -
-                      Appbar.preferredSize.height -
-                      MediaQuery.of(context).padding.top) *
-                  0.3118,
-              child: LayoutBuilder(
-                builder: (builder, constraints) => Row(
-                  children: <Widget>[
-                    Weight(
-                      weight: weight,
-                      weightAdd: plusWeight,
-                      weightSub: subWeight,
-                    ),
-                    Age(
-                      age: age,
-                      plusAge: agePlus,
-                      subAge: ageSub,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              color: Colors.transparent,
-              height: (MediaQuery.of(context).size.height -
-                      Appbar.preferredSize.height -
-                      MediaQuery.of(context).padding.top) *
-                  0.10,
-              child: CalcBmi(calculateBmi: calCulateBmi),
-            ),
-          ],
-        ));
+          ),
+          //Calculate BMI Button
+          Container(
+            color: Colors.transparent,
+            height: (MediaQuery.of(context).size.height -
+                    Appbar.preferredSize.height -
+                    MediaQuery.of(context).padding.top) *
+                0.10,
+            child: CalcBmi(calculateBmi: calCulateBmi),
+          ),
+        ],
+      ),
+    );
   }
 }
